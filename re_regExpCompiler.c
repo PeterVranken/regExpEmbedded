@@ -86,9 +86,9 @@
  * whereas "a<b(cd)+>" and "<a{3,4}x>" were correct (and probably meant). Capture groups
  * can't have a repetition indicator but they may be used in the inner of a loop. In which
  * case a successfully matching expression can have many values of the capture group in its
- * result. However, normal uses cases won't require this. If no capture group is inside a
+ * result. However, normal use cases won't require this. If no capture group is inside a
  * loop then the maximum number of results is bounded and known, which supports the memory
- * allocation for the matcher result.
+ * configuration for the matcher result.
  *
  * Copyright (C) 2024 Peter Vranken (mailto:Peter_Vranken@Yahoo.de)
  *
