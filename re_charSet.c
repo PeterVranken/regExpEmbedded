@@ -84,12 +84,12 @@
  * Read an unsigned integer number from the input stream. Two hex digits are expected in
  * the input stream at the current read position.
  *   @return
- * Get \a true if a suitable number could be read. It is assumped that no other alternative
- * is currently possible, so compilation has failed, if \a false is returned.
+ * Get \a true if a suitable number could be read. It is assumed that no other alternative
+ * is currently possible, so compilation has failed if \a false is returned.
  *   @param pCompiler
- * The compiler, which, e.g., contains the input stream.
+ * The compiler, which contains the input stream to read from.
  *   @param pC
- * The read number is returned by reference.
+ * The read number is returned by reference as a (matchable) character.
  */
 bool re_compileHexByte(struct re_compiler_t * const pCompiler, uint8_t * const pC)
 {
@@ -101,10 +101,7 @@ bool re_compileHexByte(struct re_compiler_t * const pCompiler, uint8_t * const p
     else if(c1 >= 'A'  &&  c1 <= 'F')
         c1 -= 'A' - 10;
     else
-    {
-        /* This path includes a premature end of input by seeing a zero termination byte. */
         success = false;
-    }
 
     int c2;
     if(success)
@@ -471,10 +468,6 @@ bool re_compileCharSet(struct re_compiler_t * const pCompiler)
                 re_compEmitCode(pCompiler, /* code */ iStream, sizeof(iStream));
         }
 
-        /* We have parsed a complete character set and can now emit some preliminary
-           instructions to use it. Since memory layout of the set is not finally decided,
-           the instruction will later require a relocation to finalize it. */
-
         return true;
 
         #undef GET_CHAR
@@ -488,7 +481,7 @@ bool re_compileCharSet(struct re_compiler_t * const pCompiler)
 
 /**
  * Notify a move of some already compiled code, which may require relocation. (This may
- * happen, e.g, to only afterwards recognized loop constructs.)
+ * happen, e.g, due to only afterwards recognized loop constructs.)
  *   @param pCompiler
  * The regular expression compiler is passed in by reference. It contains the access to the
  * input stream, provides access to the assembled instruction stream and allows to set an
@@ -497,7 +490,7 @@ bool re_compileCharSet(struct re_compiler_t * const pCompiler)
  * The index of the the first instruction, which is moved towards a higher address (or
  * index).
  *   @param distance
- * All instruction starting with index \a idxIFrom are moved by this number of Byte.
+ * All instructions, starting with index \a idxIFrom, are moved by this number of Byte.
  */
 void re_onInstructionMove( struct re_compiler_t * const pCompiler
                          , unsigned int idxIFrom
@@ -536,7 +529,7 @@ void re_writeCharSets(struct re_compiler_t * const pCompiler)
                        );
     } /* for(All compiled character sets to dump) */
 
-    /* In the for loop before, we "misused" the instruction pointer as data address for
+    /* In the for loop before, we "abused" the instruction pointer as data address for
        dumping the character sets and now we need to restore it. */
     const unsigned int noDataBytes = pCompiler->re.noCharSets * sizeof(re_charSet_t);
     pCompiler->re.lenIStream -= noDataBytes;
