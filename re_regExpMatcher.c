@@ -22,6 +22,9 @@
 /* Module interface
  *   re_match
  *   re_matchCString
+ *   re_getNoMatchesCaptureGrp
+ *   re_getMatchOfCaptureGrp
+ *   re_copyMatchOfCaptureGrp
  * Local functions
  *   iFetchLoop
  *   iFetchLoopEnd
@@ -132,7 +135,7 @@ struct iLoop_t
     /** The minimum required matches of the loop body. */
     unsigned int min;
     
-    /** The minimum allowed matches of the loop body. */
+    /** The maximum allowed matches of the loop body. */
     unsigned int max;
     
     /** The ID of the loop among all loops in the regular expression. */
@@ -162,8 +165,8 @@ struct iOr_t
 /** This struct represents the information, which is encoded in a jump instruction. */
 struct iJmp_t
 {
-    /** The jump distance in byte, counting from behind the jump instruction.\n
-          Note, the distance is unsigned as jump are only used inside OR expressions and
+    /** The jump distance in Byte, counting from behind the jump instruction.\n
+          Note, the distance is unsigned as jumps are only used inside OR expressions and
         reaching till the end of the expression. */
     unsigned int dist;
 };
@@ -275,11 +278,9 @@ static bool iFetchLoopEnd(struct iLoopEnd_t * const pILoopEnd, iStream_t * const
         unsigned int lenIBody = * ++pI;
         lenIBody = (lenIBody<<8) + (* ++pI);
 
-        /* First, we go back to the loop istruction. Fetching it, will then adjust the
-           pointer pILoopEnd->pIBody as expected to the beginning of the loop body.
-             3: Length of instruction I_LOOPEND.
-             6: Length of instruction I_LOOP. */
-        pILoopEnd->pIBody = ++pI - lenIBody - 3 - 6;
+        /* First, we go back to the loop instruction. Fetching it will then adjust the
+           pointer pILoopEnd->pIBody as expected to the beginning of the loop body. */
+        pILoopEnd->pIBody = ++pI - lenIBody - LEN_I_LOOPEND - LEN_I_LOOP;
         const bool isLoop = iFetchLoop(&pILoopEnd->iLoop, &pILoopEnd->pIBody);
         assert(isLoop);
 
@@ -1293,7 +1294,7 @@ bool re_match( struct re_matcher_t * const pMatcher
         pMatcher->err = re_errMatch_badMemoryConfiguration;
     }
     else
-        pMatcher->err = re_errComp_success;
+        pMatcher->err = re_errMatch_success;
 
     /* Configure input stream and reset the counters. */
     pMatcher->pRe = pCompiledRe;
@@ -1490,7 +1491,7 @@ bool re_matchCString( struct re_matcher_t * const pMatcher
  * capture group.
  *   @return
  * The number of matches is returned. Zero is returned if there is no match or if no such
- * capture group is known or if the match result is not re_errComp_success.
+ * capture group is known or if the match result is not re_errMatch_success.
  *   @param[in] pMatcher
  * The matcher object by reference. The object must not have been modified after the
  * successful run of the matcher.

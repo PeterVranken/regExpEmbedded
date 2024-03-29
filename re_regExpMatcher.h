@@ -27,11 +27,27 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "re_regExpCompiler.h"
-
 /*
  * Defines
  */
+
+/** The compiler and matcher can be compiled independently to support the use case of
+    having only compiled expressions in an embedded software program but not the
+    compiler.\n
+      This switch enables or diables the compilation of the compiler. Set this configuration
+    switch to either 1 or 0 to do so, respectively. */
+#ifndef RE_REQUIRE_COMPILER
+# define RE_REQUIRE_COMPILER    1
+#endif
+
+/** The compiler and matcher can be compiled independently to support the use case of
+    having only compiled expressions in an embedded software program but not the
+    compiler.\n
+      This switch enables or diables the compilation of the matcher. Set this configuration
+    switch to either 1 or 0 to do so, respectively. */
+#ifndef RE_REQUIRE_MATCHER
+# define RE_REQUIRE_MATCHER     1
+#endif
 
 /** If set not zero then some code is compiled which allows to rate the efficiency of the
     compiled expression for a given match. */
@@ -131,6 +147,25 @@ enum re_matcherError_t {
         maxNoPathElements, \a cGrpStack and \a maxNoCapturedGrps. This error is raised if
         some suspicious configuration is found and matching doesn't even commence. */
     re_errMatch_badMemoryConfiguration,
+};
+
+/** The compiled regular expression. */
+struct re_compiledRegExp_t
+{
+    /** The instruction stream, including constant data. Prior to compilation, this is a
+        user configured field; the user provides the memory space for the comilation of the
+        regular expression. */
+    uint8_t *iStream;
+
+    /** The number of instruction bytes in the instruction stream. This count does not
+        include the constant data bytes at the end of the instruction stream. */
+    unsigned int lenIStream;
+
+    /** The number of capture groups in the regular expression. */
+    unsigned int noCaptureGrps;
+
+    /** The number of character sets used in the instruction stream. */
+    unsigned int noCharSets;
 };
 
 /// @todo Make all of the matcher private, but add a constructor to make this possible

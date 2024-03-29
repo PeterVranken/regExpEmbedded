@@ -168,22 +168,24 @@ gcc -Wall -g3 -gdwarf-2 -Og -DDEBUG -DRE_REQUIRE_MAIN=1 re_charSet.c re_regExpCo
 ---------------------------
 
 To build only the regular expression compiler, one would set macros
-`RE_REQUIRE_COMPILER` and `RE_REQUIRE_MATCHER` accordingly and continue to
-compile all source files; the command line of the C compiler would look
-like:
+`RE_REQUIRE_COMPILER` and `RE_REQUIRE_MATCHER` accordingly. Compilation of
+re_regExpMatcher.c is not required but the header file re_regExpMatcher.h
+is still needed. (Compiler and matcher share the definitions for the
+compiled regular expression.) The command line of the C compiler would
+look like:
 
 [source,bash]
 ---------------------------
-gcc -Wall -g3 -gdwarf-2 -Og -DDEBUG -DRE_REQUIRE_COMPILER=1 -DRE_REQUIRE_MATCHER=0 re_charSet.c re_regExpCompiler.c re_regExpMatcher.c myOtherSourceFile.c ... -o myAppWithCompilerOnly.exe
+gcc -Wall -g3 -gdwarf-2 -Og -DDEBUG -DRE_REQUIRE_COMPILER=1 -DRE_REQUIRE_MATCHER=0 re_charSet.c re_regExpCompiler.c myOtherSourceFile.c ... -o myAppWithCompilerOnly.exe
 ---------------------------
 
 To build only the matcher, one would set macros `RE_REQUIRE_COMPILER` and
-`RE_REQUIRE_MATCHER` accordingly and continue to compile all source files;
-the command line of the C compiler would look like:
+`RE_REQUIRE_MATCHER` accordingly. Compilation of re_regExpCompiler.c is
+not required. The command line of the C compiler would look like:
 
 [source,bash]
 ---------------------------
-gcc -Wall -g3 -gdwarf-2 -Og -DDEBUG -DRE_REQUIRE_COMPILER=0 -DRE_REQUIRE_MATCHER=1 re_charSet.c re_regExpCompiler.c re_regExpMatcher.c myOtherSourceFile.c ... -o myAppWithMatcherOnly.exe
+gcc -Wall -g3 -gdwarf-2 -Og -DDEBUG -DRE_REQUIRE_COMPILER=0 -DRE_REQUIRE_MATCHER=1 re_charSet.c re_regExpMatcher.c myOtherSourceFile.c ... -o myAppWithMatcherOnly.exe
 ---------------------------
 
 

@@ -48,8 +48,11 @@
 #include <ctype.h>
 #include <assert.h>
 
-#include "re_regExpCompiler.h"
 #include "re_regExpMatcher.h"
+
+#if RE_REQUIRE_COMPILER == 1
+# include "re_regExpCompiler.h"
+#endif
 
 /*
  * Defines

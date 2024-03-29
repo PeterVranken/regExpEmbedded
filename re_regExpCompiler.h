@@ -27,27 +27,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "re_regExpMatcher.h"
+
 /*
  * Defines
  */
-
-/** The compiler and matcher can be compiled independently to support the use case of
-    having only compiled expressions in an embedded software program but not the
-    compiler.\n
-      This switch enables or diables the compilation of the compiler. Set this configuration
-    switch to either 1 or 0 to do so, respectively. */
-#ifndef RE_REQUIRE_COMPILER
-# define RE_REQUIRE_COMPILER    1
-#endif
-
-/** The compiler and matcher can be compiled independently to support the use case of
-    having only compiled expressions in an embedded software program but not the
-    compiler.\n
-      This switch enables or diables the compilation of the matcher. Set this configuration
-    switch to either 1 or 0 to do so, respectively. */
-#ifndef RE_REQUIRE_MATCHER
-# define RE_REQUIRE_MATCHER     1
-#endif
 
 /** A main function can be compiled, which integrates compiler and matcher into a simple
     application, which demonstartes the use of both, which supports testing regular
@@ -144,8 +128,8 @@ enum re_compilerError_t
     re_errComp_repBadSeparatorOrMissingRBrace,
 
     /** After successful parsing of {n,m of a repetition operator, the compiler fails to
-        read the closing brace. The most probable reason is the use of blanks, which is not
-        permitted. */
+        read the closing brace. The most probable reason is the use of blanks, which is
+        not permitted. */
     re_errComp_repMissingRBrace,
 
     /** It is generally not allowed to have more than 255 loops in a regular expression.
@@ -175,25 +159,6 @@ enum re_compilerError_t
     /** A character range contains the construct x-y, but character x has a character code
         greater or equal than character y. */
     re_errComp_charSetBadRange,
-};
-
-/** The compiled regular expression. */
-struct re_compiledRegExp_t
-{
-    /** The instruction stream, including constant data. Prior to compilation, this is a
-        user configured field; the user provides the memory space for the comilation of the
-        regular expression. */
-    uint8_t *iStream;
-
-    /** The number of instruction bytes in the instruction stream. This count does not
-        include the constant data bytes at the end of the instruction stream. */
-    unsigned int lenIStream;
-
-    /** The number of capture groups in the regular expression. */
-    unsigned int noCaptureGrps;
-
-    /** The number of character sets used in the instruction stream. */
-    unsigned int noCharSets;
 };
 
 /** The regular expression compiler. The object contains a combination of configuration

@@ -28,7 +28,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "re_regExpCompiler.h"
+#include "re_regExpMatcher.h"
+
+#if RE_REQUIRE_COMPILER == 1
+# include "re_regExpCompiler.h"
+#endif
 
 /*
  * Defines
@@ -39,7 +43,6 @@
  * Global type definitions
  */
 
-/// @todo Move this to re_regEx.h if it should stay the only dependency
 /** The compiler-internal representation of a character set. */
 typedef uint8_t re_charSet_t[(UINT8_MAX+1)/8u];
 
