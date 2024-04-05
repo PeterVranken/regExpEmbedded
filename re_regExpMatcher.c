@@ -90,6 +90,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 #include <assert.h>
 
 #include "re_charSet.h"
@@ -481,7 +482,7 @@ static bool iFetchLit(char * const pCLit, iStream_t * const pIStream)
  * immediate match instruction on entry. Otherwise it has been advanced behind the found
  * and executed instruction.
  */
-bool immediateMatch(bool * const pShouldMatch, iStream_t * const ppI, char c)
+static bool immediateMatch(bool * const pShouldMatch, iStream_t * const ppI, char c)
 {
     bool shouldMatch, isMatching;
 
@@ -513,11 +514,12 @@ bool immediateMatch(bool * const pShouldMatch, iStream_t * const ppI, char c)
             break;
 
         case I_DIGIT:
-            isMatching = isdigit(c);
+            isMatching = isdigit((int)c);
             break;
 
         case I_HEXDIGIT:
-            isMatching = isdigit(c) ||  (toupper(c) >= 'A'  &&  toupper(c) <= 'F');
+            isMatching = isdigit((int)c)
+                         ||  (toupper((int)c) >= 'A'  &&  toupper((int)c) <= 'F');
             break;
 
         case I_SPC:
@@ -529,15 +531,15 @@ bool immediateMatch(bool * const pShouldMatch, iStream_t * const ppI, char c)
             break;
 
         case I_LTR:
-            isMatching = isalpha(c);
+            isMatching = isalpha((int)c);
             break;
 
         case I_ID1ST:
-            isMatching = isalpha(c) || c == '_';
+            isMatching = isalpha((int)c) || c == '_';
             break;
 
         case I_ID:
-            isMatching = isalpha(c) || isdigit(c) || c == '_';
+            isMatching = isalpha((int)c) || isdigit((int)c) || c == '_';
             break;
 
         case I_CRLF:
@@ -631,7 +633,7 @@ static void pushAlternative(struct re_matcher_t *pMatcher, const uint8_t * const
     signed int idxI = pI - pMatcher->pRe->iStream;
     /* The maximum size of all our doing is 16 Bit. This has been checked already at
        compilation time and so we can have an assertion here. */
-    assert(idxI >= 0  &&  idxI <= pMatcher->pRe->lenIStream);
+    assert(idxI >= 0  &&  (unsigned)idxI <= pMatcher->pRe->lenIStream);
 
     signed int idxC = pMatcher->pC - pMatcher->cStream;
     /* The maximum string to match against the regular expression has a size of 64k. */
@@ -701,7 +703,7 @@ static void pushAlternative(struct re_matcher_t *pMatcher, const uint8_t * const
                 if(pAnchorElem->idxI + f*pTopElem->idxI_s == idxI
                    &&  pAnchorElem->idxC + f*pTopElem->idxC_s == idxC
                    &&  pAnchorElem->noCapturedGrps + f*pTopElem->noCapturedGrps_s
-                       == pMatcher->noCapturedGrps
+                       == (int)pMatcher->noCapturedGrps
                    &&  pTopElem->cntRelative < UINT8_MAX
                   )
                 {
@@ -843,8 +845,9 @@ static bool popAlternative(struct re_matcher_t * const pMatcher, const uint8_t *
                 const signed int f = (int)pAlt->cntRelative;
                 *ppI = pMatcher->pRe->iStream + (pAnchorElem->idxI + f*pAlt->idxI_s);
                 pMatcher->pC = pMatcher->cStream + (pAnchorElem->idxC + f*pAlt->idxC_s);
-                pMatcher->noCapturedGrps = (unsigned)pAnchorElem->noCapturedGrps
-                                           + f*pAlt->noCapturedGrps_s;
+                pMatcher->noCapturedGrps = (unsigned)(pAnchorElem->noCapturedGrps
+                                                      + f*pAlt->noCapturedGrps_s
+                                                     );
 
                 /* The reference counter decides whether the element is still required or
                    can be taken from the stack. */
@@ -1170,7 +1173,7 @@ static void matchLoopEnd( struct re_matcher_t * const pMatcher
                                 ||  pILoopEnd->iLoop.max < UINT8_MAX
                                );
     unsigned int cnt =  1u;
-    struct re_matcherLoopState_t *pLoopState;
+    struct re_matcherLoopState_t *pLoopState = NULL;
     if(isCntLoop)
     {
         pLoopState = getCurrentLoopState(pMatcher, pILoopEnd->iLoop.idxLoop);
@@ -1397,15 +1400,10 @@ bool re_match( struct re_matcher_t * const pMatcher
                matcher. */
             assert(shouldMatch);
 
-#ifdef TRACE_ALT
-            if(isMatching)
-            {
-                if(isprint(c))
-                    TRACE_ALT("Consumed: %c\n", c);
-                else
-                    TRACE_ALT("Consumed: \\x%02X\n", (unsigned)c);
-            }
-#endif
+            TRACE_ALT( isprint((int)c)? "%s %c\n": "%s \\x%02X\n"
+                     , isMatching? "Consumed": "Rejected"
+                     , (unsigned)c
+                     );
         }
         else
         {

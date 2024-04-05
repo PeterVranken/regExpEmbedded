@@ -139,6 +139,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 #include <assert.h>
 
 #include "re_charSet.h"
@@ -569,7 +570,7 @@ static bool compileUInt( struct re_compiler_t * const pCompiler
     char numStr[MAX_LEN_NUM_LITERAL+1u];
     bool success = true;
     unsigned int idxD = 0u;
-    while(isdigit(*pCompiler->pC))
+    while(isdigit((int)*pCompiler->pC))
     {
         if(idxD < MAX_LEN_NUM_LITERAL)
             numStr[idxD++] = *pCompiler->pC;
@@ -874,7 +875,7 @@ static bool compileImmediate( struct re_compiler_t * const pCompiler
         else
             *pPotentiallyEmpty = true;
     }
-    else if(isprint(c) && !isSpecialChar(c))
+    else if(isprint((int)c) && !isSpecialChar(c))
     {
         ++ pCompiler->pC;
 
@@ -1622,4 +1623,3 @@ int main(int noArgs, const char * const * pArgStr)
 
 } /* main */
 #endif
-
