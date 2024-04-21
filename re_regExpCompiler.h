@@ -63,102 +63,102 @@
 /** Enumeration of all possible compiler errors. */
 enum re_compilerError_t
 {
-    /** No error, compilatopn of regular expression was possible. */
-    re_errComp_success,
+    /** No error, compilation of regular expression was possible. */
+    re_errComp_success,                         /* 0 */
 
     /** On entry into the compilation, re_compile(), the compiler object needs to be
         properly configured with user provided pre-allocated memory space, which is needed
         for the compilation. This is checked and this error code is set in case the
         configuration is found implausible. */
-    re_errComp_badMemoryConfiguration,
+    re_errComp_badMemoryConfiguration,          /* 1 */
 
     /** The regular expression ended without finding the matching closing parenthesis,
         which can be a closing normal parenthesis or a closing angular bracket of the
         capture group. Note, getting this error does not necessarily mean that there is no
         such character but it can be on a bad level, e.g., by swapping different kinds of
         parenthesis. */
-    re_errComp_missingRParen,
+    re_errComp_missingRParen,                   /* 2 */
 
     /** The repetition operators must not be applied to sub-expressions, which can
         potentially match no single input character. This would lead to an infinite number
         of possible matches and the matcher would soon run out of memory. An example would
         be (x?)+ */
-    re_errComp_potentiallyEmptyBodyOfLoop,
+    re_errComp_potentiallyEmptyBodyOfLoop,      /* 3 */
 
     /** Not all of the characters of the regular expression form a valid expression. There
         is at least one trailing character, which can't be interpreted by the compiler. An
         ordinary syntax error can be the reason, e.g., a closing parenthesis if there were
         no opening pendant. */
-    re_errComp_notAllInputConsumed,
+    re_errComp_notAllInputConsumed,             /* 4 */
 
     /** For the compiler should be run on an embedded system it has a protection against
         too many stack consuming recursions. The actual maximum is user specified. Very
         complex expressions, typically with many nested levels of parenthesis, can fail to
         compile becaused more recursion levels as allowed would be needed. */
-    re_errComp_maxRecursionDepthExceeded,
+    re_errComp_maxRecursionDepthExceeded,       /* 5 */
 
     /** The empty string has been passed in as regular expression. */
-    re_errComp_emptyRegularExpr,
+    re_errComp_emptyRegularExpr,                /* 6 */
 
     /** Syntax error: The compiler has no interpretation for the next character of the
         regular expression being compiled. */
-    re_errComp_unspecifiedSyntaxErr,
+    re_errComp_unspecifiedSyntaxErr,            /* 7 */
 
     /** The compiler uses some user provided, pre-allocated memory space for the compiled
         regular expression. This error code is returned if that memory should be too
         little. */
-    re_errComp_maxLenIStreamExceeded,
+    re_errComp_maxLenIStreamExceeded,           /* 8 */
 
     /** The compiler uses some pre-allocated memory space for temporary storage of
         information about half-way compiled OR expressions. This error code is returned if
         that memory should be too little. See #MAX_NO_OR_OPERANDS for a related
         configuration item. */
-    re_errComp_maxNoOrAlternativesExceeded,
+    re_errComp_maxNoOrAlternativesExceeded,     /* 9 */
 
     /** Bounded loop using the repetition operator {n,m} have some constraints. Among more,
         n must not exceed m, m must not exceed 255. If these constraints are hurt or if n
         or m can't be properly parsed, then this error code is returned. The most probable
         reason is the use of blanks, which is not permitted; n and m are both one to three
         digits but nothing else. */
-    re_errComp_repBadNumberOrOutOfRange,
+    re_errComp_repBadNumberOrOutOfRange,        /* 10 */
 
     /** After successful parsing of {n of a repetition operator, the compiler fails to read
         either a comma or the immediately closing brace. The most probable reason is the use
         of blanks, which is not permitted. */
-    re_errComp_repBadSeparatorOrMissingRBrace,
+    re_errComp_repBadSeparatorOrMissingRBrace,  /* 11 */
 
     /** After successful parsing of {n,m of a repetition operator, the compiler fails to
         read the closing brace. The most probable reason is the use of blanks, which is
         not permitted. */
-    re_errComp_repMissingRBrace,
+    re_errComp_repMissingRBrace,                /* 12 */
 
     /** It is generally not allowed to have more than 255 loops in a regular expression.
         This eror code is returned if the limit should be exceeded. */
-    re_errComp_maxNoLoopsExceeded,
+    re_errComp_maxNoLoopsExceeded,              /* 13 */
 
     /** It is generally not allowed to have more than 255 capture groups in a regular
         expression. This eror code is returned if the limit should be exceeded. */
-    re_errComp_maxNoCaptureGroupsExceeded,
+    re_errComp_maxNoCaptureGroupsExceeded,      /* 14 */
 
     /** A special character c can be brought into the regular expression for ordinary,
         immediate match by putting \c into the regular expression. However, the escape
         character back-slash cannot be used with any character. This error code is emitted
         if it is found to be combined with an unexpected character. Mostly, the back-slash
         is simply superfluous in this case. */
-    re_errComp_invalidEscape,
+    re_errComp_invalidEscape,                   /* 15 */
 
     /** The compiler uses some user provided, pre-allocated memory space for temporary
         storage of information about half-way compiled character ranges. This error code is
         returned if that memory should be too little. */
-    re_errComp_charSetMaxNoSetsExceeded,
+    re_errComp_charSetMaxNoSetsExceeded,        /* 16 */
 
     /** Syntax error: The compiler fails to read the closing rectangular bracket, while
         parsing a character range. */
-    re_errComp_charSetMissingRParen,
+    re_errComp_charSetMissingRParen,            /* 17 */
 
     /** A character range contains the construct x-y, but character x has a character code
         greater or equal than character y. */
-    re_errComp_charSetBadRange,
+    re_errComp_charSetBadRange,                 /* 18 */
 };
 
 /** The regular expression compiler. The object contains a combination of configuration

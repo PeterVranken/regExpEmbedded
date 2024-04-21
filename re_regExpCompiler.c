@@ -1517,7 +1517,7 @@ int main(int noArgs, const char * const * pArgStr)
     }
     else
         err = -2;
-
+        
     /* Step 4 of 4: Use of compiled regular expression for testing; all further input
        arguments are matched against the expression. */
     if(err == 0  &&  idxArg1stInputString < noArgs)
@@ -1534,12 +1534,12 @@ int main(int noArgs, const char * const * pArgStr)
             /* The needed size of the memory for path alternatives depends on both, the
                regular expression and the input stream to match against it. It is hard to
                predict and the value, we see here is arbitrarily chosen. On an embedded
-               target, this can become a critical optmization. */
+               target, this can become a critical optimization. */
             .matcherPathStack = matcherPathElementAry,
             .maxNoPathElements = sizeof(matcherPathElementAry)
                                  / sizeof(*matcherPathElementAry),
 
-            /* The needed size of the memory for capture groups is mosten often predictable
+            /* The needed size of the memory for capture groups is most often predictable
                for a given regular expression. For most use-cases (if not used inside the
                body of unbounded loops), it barely depends on the input stream. The memory
                should suffice for the number of groups used in the regular expression. */
