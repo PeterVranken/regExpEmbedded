@@ -282,6 +282,9 @@ static bool iFetchLoopEnd(struct iLoopEnd_t * const pILoopEnd, iStream_t * const
         /* First, we go back to the loop instruction. Fetching it will then adjust the
            pointer pILoopEnd->pIBody as expected to the beginning of the loop body. */
         pILoopEnd->pIBody = ++pI - lenIBody - LEN_I_LOOPEND - LEN_I_LOOP;
+#ifndef DEBUG
+        __attribute__((unused))
+#endif
         const bool isLoop = iFetchLoop(&pILoopEnd->iLoop, &pILoopEnd->pIBody);
         assert(isLoop);
 
@@ -475,7 +478,7 @@ static bool iFetchLit(char * const pCLit, iStream_t * const pIStream)
  * is a match with the current input character.
  *   @param pShouldMatch
  * The function returns by reference whether the current instruction is an immediate match.
- * If * \a pShouldMatch is \a false on exit then the matcher needs to consider an other
+ * If * \a pShouldMatch is \a false on exit then the matcher needs to consider another
  * instruction.
  *   @param[in,out] ppI
  * The current instruction pointer by reference. It is not moved if it doesn't point to an
@@ -582,10 +585,10 @@ static bool pruneAlternative( struct re_matcher_t *pMatcher
 {
     const uint8_t * const pEndI = pMatcher->pRe->iStream + pMatcher->pRe->lenIStream;
 
-    /* We may advance pI over I_CAP, I_CAPEND.
-         2: Length of both the skipped instructions. */
+    /* We may advance pI over I_CAP, I_CAPEND. */
+    _Static_assert(LEN_I_CAP == LEN_I_CAPEND, "Implementation can't combine instructions");
     while(pI < pEndI  &&  (*pI == OP_CAP  ||  *pI == OP_CAPEND))
-        pI += 2u;
+        pI += LEN_I_CAP;
 
     bool doPrune = false;
     if(pI < pEndI)
@@ -1324,6 +1327,10 @@ bool re_match( struct re_matcher_t * const pMatcher
            given purpose. */
         ++ pMatcher->noInstructions;
 #endif
+        /* The space for the different potential instructions can be combined, they are
+           used either or. The arbitrary, useless and superfluous initializer expression is
+           only due to avoidance of warnings with some compilers ("potential use of
+           uninitialized variable"). */
         union
         {
             struct iLoop_t loop;
@@ -1332,7 +1339,7 @@ bool re_match( struct re_matcher_t * const pMatcher
             struct iJmp_t jmp;
             struct iCap_t cap;
             struct iCapEnd_t capEnd;
-        } instr;
+        } instr = {.or = {.lenAlternative = 0u,},};
 
         if(iFetchLoop(&instr.loop, &pI))
             matchLoop(pMatcher, &instr.loop, &pI);
