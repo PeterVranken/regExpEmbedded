@@ -34,7 +34,8 @@
  * matches ']' and 'a', whereas [a]] is not a valid set. Character sets support a few
  * escape sequences to get special characters into the set. These are: \f, \r, \n, \t, \xHH
  * and \\. Caution, the ']' can't be the first character of a range, i.e., []-}] would
- * match only three single characters but not all from ']' till '}'. Write []^-}] instead.
+ * match only three single characters, ']', '-' and '}', but not all from ']' till '}'.
+ * Write []^-}] instead.
  *
  * [^abc1-9x-z]: Inverse character sets. All but the listed single characters and the
  * characters in the ranges x-y, both including, match. The caret behind the opening
